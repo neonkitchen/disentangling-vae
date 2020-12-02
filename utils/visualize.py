@@ -261,7 +261,7 @@ class Visualizer():
         decoded_traversal = self._decode_latents(torch.cat(latent_samples, dim=0))
 
         if is_reorder_latents:
-            n_images, *other_shape = decoded_traversal.size()
+            n_images, other_shape = decoded_traversal.size()
             n_rows = n_images // n_per_latent
             decoded_traversal = decoded_traversal.reshape(n_rows, n_per_latent, *other_shape)
             decoded_traversal = sort_list_by_other(decoded_traversal, self.losses)
