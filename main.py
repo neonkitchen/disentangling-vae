@@ -39,23 +39,29 @@ def parse_arguments(args_to_parse):
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=FormatterNoDuplicate)
 
-    # General options
+    ### General options argument group
     general = parser.add_argument_group('General options')
+
     general.add_argument('name', type=str,
                          help="Name of the model for storing and loading purposes.")
+
     general.add_argument('-L', '--log-level', help="Logging levels.",
                          default=default_config['log_level'], choices=LOG_LEVELS)
+
     general.add_argument('--no-progress-bar', action='store_true',
                          default=default_config['no_progress_bar'],
                          help='Disables progress bar.')
+
     general.add_argument('--no-cuda', action='store_true',
                          default=default_config['no_cuda'],
                          help='Disables CUDA training, even when have one.')
+
     general.add_argument('-s', '--seed', type=int, default=default_config['seed'],
                          help='Random seed. Can be `None` for stochastic behavior.')
 
-    # Learning options
+    ### Training specific options argument group
     training = parser.add_argument_group('Training specific options')
+
     training.add_argument('--checkpoint-every',
                           type=int, default=default_config['checkpoint_every'],
                           help='Save a checkpoint of the trained model every n epoch.')
@@ -73,30 +79,38 @@ def parse_arguments(args_to_parse):
     training.add_argument('--lr', type=float, default=default_config['lr'],
                           help='Learning rate.')
 
-    # Model Options
+    ### Model specfic options argument group
     model = parser.add_argument_group('Model specfic options')
+
     model.add_argument('-m', '--model-type',
                        default=default_config['model'], choices=MODELS,
                        help='Type of encoder and decoder to use.')
+
     model.add_argument('-z', '--latent-dim', type=int,
                        default=default_config['latent_dim'],
                        help='Dimension of the latent variable.')
+
     model.add_argument('-l', '--loss',
                        default=default_config['loss'], choices=LOSSES,
                        help="Type of VAE loss function to use.")
+
     model.add_argument('-r', '--rec-dist', default=default_config['rec_dist'],
                        choices=RECON_DIST,
                        help="Form of the likelihood ot use for each pixel.")
+
     model.add_argument('-a', '--reg-anneal', type=float,
                        default=default_config['reg_anneal'],
                        help="Number of annealing steps where gradually adding the regularisation. What is annealed is specific to each loss.")
 
-    # Loss Specific Options
+    ### Loss options in various argument groups 
+    ### BetaH loss specific argument group 
     betaH = parser.add_argument_group('BetaH specific parameters')
+
     betaH.add_argument('--betaH-B', type=float,
                        default=default_config['betaH_B'],
                        help="Weight of the KL (beta in the paper).")
 
+    ### BetaH loss specific argument group 
     betaB = parser.add_argument_group('BetaB specific parameters')
     betaB.add_argument('--betaB-initC', type=float,
                        default=default_config['betaB_initC'],
@@ -108,36 +122,47 @@ def parse_arguments(args_to_parse):
                        default=default_config['betaB_G'],
                        help="Weight of the KL divergence term (gamma in the paper).")
 
+    ### factor loss specific argument group 
     factor = parser.add_argument_group('factor VAE specific parameters')
+
     factor.add_argument('--factor-G', type=float,
                         default=default_config['factor_G'],
                         help="Weight of the TC term (gamma in the paper).")
+
     factor.add_argument('--lr-disc', type=float,
                         default=default_config['lr_disc'],
                         help='Learning rate of the discriminator.')
 
+    ### btcvae loss specific argument group 
     btcvae = parser.add_argument_group('beta-tcvae specific parameters')
+
     btcvae.add_argument('--btcvae-A', type=float,
                         default=default_config['btcvae_A'],
                         help="Weight of the MI term (alpha in the paper).")
+
     btcvae.add_argument('--btcvae-G', type=float,
                         default=default_config['btcvae_G'],
                         help="Weight of the dim-wise KL term (gamma in the paper).")
+
     btcvae.add_argument('--btcvae-B', type=float,
                         default=default_config['btcvae_B'],
                         help="Weight of the TC term (beta in the paper).")
 
-    # Learning options
+    ### Evaluation specific options argument group
     evaluation = parser.add_argument_group('Evaluation specific options')
+
     evaluation.add_argument('--is-eval-only', action='store_true',
                             default=default_config['is_eval_only'],
                             help='Whether to only evaluate using precomputed model `name`.')
+
     evaluation.add_argument('--is-metrics', action='store_true',
                             default=default_config['is_metrics'],
                             help="Whether to compute the disentangled metrcics. Currently only possible with `dsprites` as it is the only dataset with known true factors of variations.")
+
     evaluation.add_argument('--no-test', action='store_true',
                             default=default_config['no_test'],
                             help="Whether not to compute the test losses.`")
+                            
     evaluation.add_argument('--eval-batchsize', type=int,
                             default=default_config['eval_batchsize'],
                             help='Batch size for evaluation.')
