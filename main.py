@@ -33,7 +33,7 @@ def parse_arguments(args_to_parse):
     args_to_parse: list of str
         Arguments to parse (splitted on whitespaces).
     """
-    default_config = get_config_section([CONFIG_FILE], "Custom")
+    default_config = get_config_section([CONFIG_FILE], "custom")
 
     description = "PyTorch implementation and evaluation of disentangled Variational AutoEncoders and metrics."
     parser = argparse.ArgumentParser(description=description,
@@ -96,7 +96,7 @@ def parse_arguments(args_to_parse):
 
     model.add_argument('-r', '--rec-dist', default=default_config['rec_dist'],
                        choices=RECON_DIST,
-                       help="Form of the likelihood ot use for each pixel.")
+                       help="Form of the likelihood to use for each pixel.")
 
     model.add_argument('-a', '--reg-anneal', type=float,
                        default=default_config['reg_anneal'],
@@ -110,7 +110,7 @@ def parse_arguments(args_to_parse):
                        default=default_config['betaH_B'],
                        help="Weight of the KL (beta in the paper).")
 
-    ### BetaH loss specific argument group 
+    ### BetaB loss specific argument group 
     betaB = parser.add_argument_group('BetaB specific parameters')
     betaB.add_argument('--betaB-initC', type=float,
                        default=default_config['betaB_initC'],
@@ -216,7 +216,7 @@ def main(args):
         if args.loss == "factor":
             logger.info("FactorVae needs 2 batches per iteration. To replicate this behavior while being consistent, we double the batch size and the the number of epochs.")
             args.batch_size *= 2
-            args.epochs *= 2
+            args.epochs *= 2                                                                                                        
 
         # PREPARES DATA
         train_loader = get_dataloaders(args.dataset,
