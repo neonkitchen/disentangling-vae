@@ -59,9 +59,9 @@ class BaseLoss(abc.ABC):
         Every how many steps to recorsd the loss.
 
     rec_dist: {"bernoulli", "gaussian", "laplace"}, optional
-        Reconstruction distribution istribution of the likelihood on the each pixel.
+        Reconstruction distribution of the likelihood on the each pixel.
         Implicitely defines the reconstruction loss. Bernoulli corresponds to a
-        binary cross entropy (bse), Gaussian corresponds to MSE, Laplace
+        binary cross entropy (BSE), Gaussian corresponds to MSE, Laplace
         corresponds to L1.
 
     steps_anneal: nool, optional
@@ -387,6 +387,85 @@ class BtcvaeLoss(BaseLoss):
             _ = _kl_normal_loss(*latent_dist, storer)
 
         return loss
+
+class btcvaeAnnealLoss(BaseLoss):
+    """
+    Compute the decomposed KL loss with either minibatch weighted sampling or
+    minibatch stratified sampling according to [1]
+
+    Parameters
+    ----------
+    n_data: int
+        Number of data in the training set
+
+    alpha : float
+        Weight of the mutual information term.
+
+    beta : float
+        Weight of the total correlation term.
+
+    gamma : float
+        Weight of the dimension-wise KL term.
+
+    is_mss : bool
+        Whether to use minibatch stratified sampling instead of minibatch
+        weighted sampling.
+
+    kwargs:
+        Additional arguments for `BaseLoss`, e.g. rec_dist`.
+
+    References
+    ----------
+       [1] Chen, Tian Qi, et al. "Isolating sources of disentanglement in variational
+       autoencoders." Advances in Neural Information Processing Systems. 2018.
+    """
+
+    def __init__(self, n_data, alpha=1., beta=6., gamma=1., is_mss=True, **kwargs):
+        super().__init__(**kwargs)
+        self.n_data = n_data
+        self.beta = beta
+        self.alpha = alpha
+        self.gamma = gamma
+        self.is_mss = is_mss  # minibatch stratified sampling
+
+    def __call__(self, data, recon_batch, latent_dist, is_train, storer,
+                 latent_sample=None):
+        storer = self._pre_call(is_train, storer)
+        batch_size, latent_dim = latent_sample.shape
+
+        rec_loss = _reconstruction_loss(data, recon_batch,
+                                        storer=storer,
+                                        distribution=self.rec_dist)
+        log_pz, log_qz, log_prod_qzi, log_q_zCx = _get_log_pz_qz_prodzi_qzCx(latent_sample,
+                                                                             latent_dist,
+                                                                             self.n_data,
+                                                                             is_mss=self.is_mss)
+        # I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
+        mi_loss = (log_q_zCx - log_qz).mean()
+        # TC[z] = KL[q(z)||\prod_i z_i]
+        tc_loss = (log_qz - log_prod_qzi).mean()
+        # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
+        dw_kl_loss = (log_prod_qzi - log_pz).mean()
+
+        anneal_reg = (linear_annealing(0, 1, self.n_train_steps, self.steps_anneal)
+                      if is_train else 1)
+
+        # total loss 
+        loss = rec_loss + (anneal_reg *self.alpha * mi_loss +
+                           anneal_reg *self.beta * tc_loss +
+                           anneal_reg * self.gamma * dw_kl_loss)
+
+        if storer is not None:
+            storer['loss'].append(loss.item())
+            storer['mi_loss'].append(mi_loss.item())
+            storer['tc_loss'].append(tc_loss.item())
+            storer['dw_kl_loss'].append(dw_kl_loss.item())
+            # computing this for storing and comparaison purposes
+            _ = _kl_normal_loss(*latent_dist, storer)
+
+        return loss
+
+
 
 
 def _reconstruction_loss(data, recon_data, distribution="bernoulli", storer=None):
