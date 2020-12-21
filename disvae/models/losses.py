@@ -17,7 +17,6 @@ from disvae.utils.math import (log_density_gaussian, log_importance_weight_matri
 LOSSES = ["VAE", "betaH", "betaB", "factor", "btcvae"]
 RECON_DIST = ["bernoulli", "laplace", "gaussian"]
 
-
 # TO-DO: clean n_data and device
 def get_loss_f(loss_name, **kwargs_parse):
     """Return the correct loss function given the argparse arguments."""
