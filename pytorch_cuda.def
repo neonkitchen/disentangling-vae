@@ -1,0 +1,17 @@
+Bootstrap: docker
+From: python:3.7
+%post
+	echo "Hello from inside the container"
+     
+	pip install click
+	pip install torch
+        pip install torchvision
+        pip install matplotlib
+        pip install scipy
+        pip install imageio
+        pip install scikit-image
+        pip install pandas
+        pip install seaborn
+        pip install Pillow
+        pip install tqdm
+	git clone https://github.com/neonkitchen/disentangling-vae.git	   	
