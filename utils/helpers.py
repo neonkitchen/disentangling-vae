@@ -28,6 +28,7 @@ def set_seed(seed):
         torch.manual_seed(seed)
         # if want pure determinism could uncomment below: but slower
         torch.backends.cudnn.deterministic = True
+        torch.cuda.manual_seed_all(seed)
 
 
 def get_device(is_gpu=True):
