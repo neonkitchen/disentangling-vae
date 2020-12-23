@@ -209,96 +209,79 @@ def main(args):
     device = get_device(is_gpu=not args.no_cuda)
     exp_dir = os.path.join(RES_DIR, args.name)
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
-    
 
-    
-    if not args.is_eval_only:
 
-        create_safe_directory(exp_dir, logger=logger)
+    with wandb.init(project="disentangle-test", config=args):
+        config = wandb.config
 
-        if args.loss == "factor":
-            logger.info("FactorVae needs 2 batches per iteration. To replicate this behavior while being consistent, we double the batch size and the the number of epochs.")
-            args.batch_size *= 2
-            args.epochs *= 2                                                                                                        
+        if not args.is_eval_only:
 
-        # PREPARES DATA
-        train_loader = get_dataloaders(args.dataset,
-                                       batch_size=args.batch_size,
-                                       logger=logger)
-        logger.info("Train {} with {} samples".format(args.dataset, len(train_loader.dataset)))
+            create_safe_directory(exp_dir, logger=logger)
 
-        # PREPARES MODEL
-        args.img_size = get_img_size(args.dataset)  # stores for metadata
-        model = init_specific_model(args.model_type, args.img_size, args.latent_dim)
-        wandb.watch(model)
-        logger.info('Num parameters in model: {}'.format(get_n_param(model)))
+            if args.loss == "factor":
+                logger.info("FactorVae needs 2 batches per iteration. To replicate this behavior while being consistent, we double the batch size and the the number of epochs.")
+                args.batch_size *= 2
+                args.epochs *= 2                                                                                                        
 
-        # TRAINS
-        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+            # PREPARES DATA
+            train_loader = get_dataloaders(args.dataset,
+                                        batch_size=args.batch_size,
+                                        logger=logger)
+            logger.info("Train {} with {} samples".format(args.dataset, len(train_loader.dataset)))
 
-        model = model.to(device)  # make sure trainer and viz on same device
-        gif_visualizer = GifTraversalsTraining(model, args.dataset, exp_dir)
-        loss_f = get_loss_f(args.loss,
-                            n_data=len(train_loader.dataset),
+            # PREPARES MODEL
+            args.img_size = get_img_size(args.dataset)  # stores for metadata
+            model = init_specific_model(args.model_type, args.img_size, args.latent_dim)
+           
+            logger.info('Num parameters in model: {}'.format(get_n_param(model)))
+            wandb.watch(model)
+            
+            # TRAINS
+            optimizer = optim.Adam(model.parameters(), lr=args.lr)
+
+            model = model.to(device)  # make sure trainer and viz on same device
+            gif_visualizer = GifTraversalsTraining(model, args.dataset, exp_dir)
+            loss_f = get_loss_f(args.loss,
+                                n_data=len(train_loader.dataset),
+                                device=device,
+                                **vars(args))
+
+            trainer = Trainer(model, optimizer, loss_f,
                             device=device,
-                            **vars(args))
+                            logger=logger,
+                            save_dir=exp_dir,
+                            is_progress_bar=not args.no_progress_bar,
+                            gif_visualizer=gif_visualizer)
+            trainer(train_loader,
+                    epochs=args.epochs,
+                    checkpoint_every=args.checkpoint_every,)
 
-        trainer = Trainer(model, optimizer, loss_f,
-                          device=device,
-                          logger=logger,
-                          save_dir=exp_dir,
-                          is_progress_bar=not args.no_progress_bar,
-                          gif_visualizer=gif_visualizer)
-        trainer(train_loader,
-                epochs=args.epochs,
-                checkpoint_every=args.checkpoint_every,)
+            # SAVE MODEL AND EXPERIMENT INFORMATION
+            save_model(trainer.model, exp_dir, metadata=vars(args))
 
-        # SAVE MODEL AND EXPERIMENT INFORMATION
-        save_model(trainer.model, exp_dir, metadata=vars(args))
+        if args.is_metrics or not args.no_test:
+            model = load_model(exp_dir, is_gpu=not args.no_cuda)
+            metadata = load_metadata(exp_dir)
+            # TO-DO: currently uses train datatset
+            test_loader = get_dataloaders(metadata["dataset"],
+                                        batch_size=args.eval_batchsize,
+                                        shuffle=False,
+                                        logger=logger)
+            loss_f = get_loss_f(args.loss,
+                                n_data=len(test_loader.dataset),
+                                device=device,
+                                **vars(args))
+            evaluator = Evaluator(model, loss_f,
+                                device=device,
+                                logger=logger,
+                                save_dir=exp_dir,
+                                is_progress_bar=not args.no_progress_bar)
 
-    if args.is_metrics or not args.no_test:
-        model = load_model(exp_dir, is_gpu=not args.no_cuda)
-        metadata = load_metadata(exp_dir)
-        # TO-DO: currently uses train datatset
-        test_loader = get_dataloaders(metadata["dataset"],
-                                      batch_size=args.eval_batchsize,
-                                      shuffle=False,
-                                      logger=logger)
-        loss_f = get_loss_f(args.loss,
-                            n_data=len(test_loader.dataset),
-                            device=device,
-                            **vars(args))
-        evaluator = Evaluator(model, loss_f,
-                              device=device,
-                              logger=logger,
-                              save_dir=exp_dir,
-                              is_progress_bar=not args.no_progress_bar)
-
-        evaluator(test_loader, is_metrics=args.is_metrics, is_losses=not args.no_test)
+            evaluator(test_loader, is_metrics=args.is_metrics, is_losses=not args.no_test)
 
 
 
 
-
-
-def model_pipeline(hyperparameters):
-
-    # tell wandb to get started
-    with wandb.init(project="Disentangle-test", config=hyperparameters):
-      # access all HPs through wandb.config, so logging matches execution!
-      config = wandb.config
-
-      # make the model, data, and optimization problem
-      model, train_loader, test_loader, criterion, optimizer = make(config)
-      print(model)
-
-      # and use them to train the model
-      train(model, train_loader, criterion, optimizer, config)
-
-      # and test its final performance
-      test(model, test_loader)
-
-    return model
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
