@@ -84,6 +84,8 @@ class Trainer():
             mean_epoch_loss = self._train_epoch(data_loader, storer, epoch)
             self.logger.info('Epoch: {} Average loss per image: {:.2f}'.format(epoch + 1,
                                                                                mean_epoch_loss))
+            wandb.log({"epoch": (epoch+1), "mean_epoch_loss": mean_epoch_loss}, step=example_ct)
+            
             self.losses_logger.log(epoch, storer)
 
             if self.gif_visualizer is not None:
