@@ -9,6 +9,7 @@ import torch
 from torch.nn import functional as F
 
 from disvae.utils.modelIO import save_model
+import wandb
 
 
 TRAIN_LOSSES_LOGFILE = "train_losses.log"
@@ -85,7 +86,7 @@ class Trainer():
             self.logger.info('Epoch: {} Average loss per image: {:.2f}'.format(epoch + 1,
                                                                                mean_epoch_loss))
             
-            
+            wandb.log({"epoch": (epoch+1), "mean_epoch_loss": mean_epoch_loss})
             self.losses_logger.log(epoch, storer)
 
             if self.gif_visualizer is not None:
