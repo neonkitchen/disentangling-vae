@@ -234,7 +234,7 @@ def main(args):
             model = init_specific_model(args.model_type, args.img_size, args.latent_dim)
            
             logger.info('Num parameters in model: {}'.format(get_n_param(model)))
-           
+            wandb.watch(model)
             
             # TRAINS
             optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -245,7 +245,7 @@ def main(args):
                                 n_data=len(train_loader.dataset),
                                 device=device,
                                 **vars(args))
-            wandb.watch(model, optimizer, log="all", log_freq=10)
+
             trainer = Trainer(model, optimizer, loss_f,
                             device=device,
                             logger=logger,
