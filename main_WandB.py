@@ -188,7 +188,6 @@ def parse_arguments(args_to_parse):
 
 
 
-
 def main(args):
     """Main train and evaluation function.
 
@@ -210,9 +209,8 @@ def main(args):
     device = get_device(is_gpu=not args.no_cuda)
     exp_dir = os.path.join(RES_DIR, args.name)
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
+    
 
-    wandb.init()
-    wandb.config.update(args)
     
     if not args.is_eval_only:
 
@@ -244,6 +242,7 @@ def main(args):
                             n_data=len(train_loader.dataset),
                             device=device,
                             **vars(args))
+
         trainer = Trainer(model, optimizer, loss_f,
                           device=device,
                           logger=logger,
@@ -277,6 +276,29 @@ def main(args):
 
         evaluator(test_loader, is_metrics=args.is_metrics, is_losses=not args.no_test)
 
+
+
+
+
+
+def model_pipeline(hyperparameters):
+
+    # tell wandb to get started
+    with wandb.init(project="Disentangle-test", config=hyperparameters):
+      # access all HPs through wandb.config, so logging matches execution!
+      config = wandb.config
+
+      # make the model, data, and optimization problem
+      model, train_loader, test_loader, criterion, optimizer = make(config)
+      print(model)
+
+      # and use them to train the model
+      train(model, train_loader, criterion, optimizer, config)
+
+      # and test its final performance
+      test(model, test_loader)
+
+    return model
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
