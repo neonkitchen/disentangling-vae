@@ -1,0 +1,98 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.10.12
+    code_path: code/main_WandB.py
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.7.6
+batch_size:
+  desc: null
+  value: 64
+betaB_G:
+  desc: null
+  value: 100
+betaB_finC:
+  desc: null
+  value: 25
+betaB_initC:
+  desc: null
+  value: 0
+betaH_B:
+  desc: null
+  value: 4
+btcvae_A:
+  desc: null
+  value: 1
+btcvae_B:
+  desc: null
+  value: 6
+btcvae_G:
+  desc: null
+  value: 1
+checkpoint_every:
+  desc: null
+  value: 30
+dataset:
+  desc: null
+  value: dsprites
+epochs:
+  desc: null
+  value: 1
+eval_batchsize:
+  desc: null
+  value: 1000
+experiment:
+  desc: null
+  value: custom
+factor_G:
+  desc: null
+  value: 6
+is_eval_only:
+  desc: null
+  value: false
+is_metrics:
+  desc: null
+  value: false
+latent_dim:
+  desc: null
+  value: 10
+log_level:
+  desc: null
+  value: info
+loss:
+  desc: null
+  value: betaB
+lr:
+  desc: null
+  value: 0.0005
+lr_disc:
+  desc: null
+  value: 5.0e-05
+model_type:
+  desc: null
+  value: Burgess
+name:
+  desc: null
+  value: btcvae_celeba_mini
+no_cuda:
+  desc: null
+  value: false
+no_progress_bar:
+  desc: null
+  value: false
+no_test:
+  desc: null
+  value: false
+rec_dist:
+  desc: null
+  value: bernoulli
+reg_anneal:
+  desc: null
+  value: 10000
+seed:
+  desc: null
+  value: 1234

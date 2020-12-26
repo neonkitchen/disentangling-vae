@@ -86,7 +86,6 @@ class Trainer():
             self.logger.info('Epoch: {} Average loss per image: {:.2f}'.format(epoch + 1,
                                                                                mean_epoch_loss))
             
-            wandb.log({"epoch": (epoch+1), "mean_epoch_loss": mean_epoch_loss})
             self.losses_logger.log(epoch, storer)
 
             if self.gif_visualizer is not None:
@@ -127,13 +126,15 @@ class Trainer():
         kwargs = dict(desc="Epoch {}".format(epoch + 1), leave=False,
                       disable=not self.is_progress_bar)
         with trange(len(data_loader), **kwargs) as t:
+            it = 0
             for _, (data, _) in enumerate(data_loader):
                 iter_loss = self._train_iteration(data, storer)
+                wandb.log({"it:": it, "iter_loss": iter_loss})
                 epoch_loss += iter_loss
+                it=+1
 
                 t.set_postfix(loss=iter_loss)
                 t.update()
-        wandb.log({"epoch": (epoch+1), "iter_loss": iter_loss})
         mean_epoch_loss = epoch_loss / len(data_loader)
         return mean_epoch_loss
 
@@ -163,7 +164,7 @@ class Trainer():
         except ValueError:
             # for losses that use multiple optimizers (e.g. Factor)
             loss = self.loss_f.call_optimize(data, self.model, self.optimizer, storer)
-
+        
         return loss.item()
 
 
@@ -191,7 +192,7 @@ class LossesLogger(object):
         for k, v in losses_storer.items():
             log_string = ",".join(str(item) for item in [epoch, k, mean(v)])
             self.logger.debug(log_string)
-
+           
 
 # HELPERS
 def mean(l):
