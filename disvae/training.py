@@ -68,7 +68,7 @@ class Trainer():
         """
         Trains the model.
 
-        Parameters
+        Paramet ers
         ----------
         data_loader: torch.utils.data.DataLoader
 
