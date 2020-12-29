@@ -14,8 +14,9 @@ archive*
 log*
 pretrained_models
 test/
+wandb/
 
-# Byte-compiled / optimized / DLL files
+#Byte-compiled / optimized / DLL files
 *.egg-info
 *pyc
 __pycache__/
