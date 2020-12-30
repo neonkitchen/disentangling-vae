@@ -373,19 +373,20 @@ class BtcvaeLoss(BaseLoss):
                       if is_train else 1)
 
         # total loss
-        loss = rec_loss + (self.alpha * mi_loss +
+        non_rec_loss = (self.alpha * mi_loss +
                            self.beta * tc_loss +
                            anneal_reg * self.gamma * dw_kl_loss)
+        loss = rec_loss + non_rec_loss
 
         if storer is not None:
-            storer['loss'].append(loss.item())
+            storer['loss'].append(loss. item())
             storer['mi_loss'].append(mi_loss.item())
             storer['tc_loss'].append(tc_loss.item())
             storer['dw_kl_loss'].append(dw_kl_loss.item())
             # computing this for storing and comparaison purposes
             _ = _kl_normal_loss(*latent_dist, storer)
 
-        return loss
+        return rec_loss, non_rec_loss
 
 class btcvaeAnnealLoss(BaseLoss):
     """

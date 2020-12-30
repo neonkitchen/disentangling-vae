@@ -246,7 +246,8 @@ def main(args):
                                 device=device,
                                 **vars(args))
             wandb.watch(model, optimizer, log="all", log_freq=1)
-            trainer = Trainer(model, optimizer, loss_f,
+            trainer = Trainer(model, optimizer, loss_f=loss_f,
+                            loss_name=args.loss,
                             device=device,
                             logger=logger,
                             save_dir=exp_dir,
@@ -254,7 +255,7 @@ def main(args):
                             gif_visualizer=gif_visualizer)
             trainer(train_loader,
                     epochs=args.epochs,
-                    checkpoint_every=args.checkpoint_every,)
+                    checkpoint_every=args.checkpoint_every)
 
             # SAVE MODEL AND EXPERIMENT INFORMATION
             save_model(trainer.model, exp_dir, metadata=vars(args))

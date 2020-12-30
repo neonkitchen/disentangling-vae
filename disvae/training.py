@@ -44,7 +44,7 @@ class Trainer():
         Whether to use a progress bar for training.
     """
 
-    def __init__(self, model, optimizer, loss_f,
+    def __init__(self, model, optimizer, loss_f,loss_name,
                  device=torch.device("cpu"),
                  logger=logging.getLogger(__name__),
                  save_dir="results",
@@ -53,7 +53,8 @@ class Trainer():
 
         self.device = device
         self.model = model.to(self.device)
-        self.loss_f = loss_f
+        self.loss_f= loss_f
+        self.loss_name = loss_name
         self.optimizer = optimizer
         self.save_dir = save_dir
         self.is_progress_bar = is_progress_bar
@@ -68,7 +69,7 @@ class Trainer():
         """
         Trains the model.
 
-        Paramet ers
+        Parameters
         ----------
         data_loader: torch.utils.data.DataLoader
 
@@ -82,7 +83,7 @@ class Trainer():
         self.model.train()
         for epoch in range(epochs):
             storer = defaultdict(list)
-            mean_epoch_loss = self._train_epoch(data_loader, storer, epoch)
+            mean_epoch_loss = self._train_epoch(data_loader, storer, epoch, self.loss_name)
             self.logger.info('Epoch: {} Average loss per image: {:.2f}'.format(epoch + 1,
                                                                                mean_epoch_loss))
             
@@ -103,7 +104,7 @@ class Trainer():
         delta_time = (default_timer() - start) / 60
         self.logger.info('Finished training after {:.1f} min.'.format(delta_time))
 
-    def _train_epoch(self, data_loader, storer, epoch):
+    def _train_epoch(self, data_loader, storer, epoch, loss_name):
         """
         Trains the model for one epoch.
 
@@ -128,8 +129,13 @@ class Trainer():
         with trange(len(data_loader), **kwargs) as t:
             it = 0
             for _, (data, _) in enumerate(data_loader):
-                iter_loss = self._train_iteration(data, storer)
-                wandb.log({"it:": it, "iter_loss": iter_loss})
+                if self.loss_name == "btcvae":
+                    rec_loss, non_rec_loss = self._train_iteration(data, storer)
+                    iter_loss = rec_loss + non_rec_loss
+                    wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
+                else:    
+                    iter_loss = self._train_iteration(data, storer)
+                    wandb.log({"it:": it, "loss": iter_loss})
                 epoch_loss += iter_loss
                 it=+1
 
@@ -152,11 +158,17 @@ class Trainer():
         """
         batch_size, channel, height, width = data.size()
         data = data.to(self.device)
-
+        
         try:
             recon_batch, latent_dist, latent_sample = self.model(data)
-            loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
-                               storer, latent_sample=latent_sample)
+            if self.loss_name == "btcvae":
+
+                rec_loss, non_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
+                                storer, latent_sample=latent_sample)
+                loss = rec_loss + non_rec_loss
+            else:
+                loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
+                                storer, latent_sample=latent_sample)
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
@@ -165,7 +177,10 @@ class Trainer():
             # for losses that use multiple optimizers (e.g. Factor)
             loss = self.loss_f.call_optimize(data, self.model, self.optimizer, storer)
         
-        return loss.item()
+        if self.loss_name == "btcvae":
+            return rec_loss.item(), non_rec_loss.item()
+        else:
+            return loss.item()
 
 
 class LossesLogger(object):
