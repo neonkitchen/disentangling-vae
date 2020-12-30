@@ -135,13 +135,16 @@ class Trainer():
                     wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
                 else:    
                     iter_loss = self._train_iteration(data, storer)
-                    wandb.log({"it:": it, "loss": iter_loss})
+                    wandb.log({"epoch": epoch, "it:": it, "loss": iter_loss})
                 epoch_loss += iter_loss
+                
                 it=+1
 
                 t.set_postfix(loss=iter_loss)
                 t.update()
+        wandb.log({"epoch": epoch, "epoch_loss": epoch_loss })
         mean_epoch_loss = epoch_loss / len(data_loader)
+        wandb.log({"epoch": epoch, "mean_epoch_los": mean_epoch_loss })
         return mean_epoch_loss
 
     def _train_iteration(self, data, storer):
@@ -175,7 +178,7 @@ class Trainer():
 
         except ValueError:
             # for losses that use multiple optimizers (e.g. Factor)
-            loss = self.loss_f.call_optimize(data, self.model, self.optimizer, storer)
+            loss = self.loss_f.call_optimize(data , self.model, self.optimizer, storer)
         
         if self.loss_name == "btcvae":
             return rec_loss.item(), non_rec_loss.item()

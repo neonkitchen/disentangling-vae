@@ -211,8 +211,12 @@ def main(args):
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
 
 
-    with wandb.init(project="disentangle-test", config=args):
-        config = wandb.config
+    with wandb.init(name="loss-split-test", 
+                    project="disentangle-test",
+                    notes='This is a test run', 
+                    tags=['btcvae', 'dspites'],
+                    entity='neonkitchen',
+            config = wandb.config):
 
         if not args.is_eval_only:
 
