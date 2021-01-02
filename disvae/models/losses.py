@@ -376,7 +376,7 @@ class BtcvaeLoss(BaseLoss):
         non_rec_loss = (self.alpha * mi_loss +
                            self.beta * tc_loss +
                            anneal_reg * self.gamma * dw_kl_loss)
-        loss = rec_loss - non_rec_loss
+        loss = rec_loss + non_rec_loss
 
         if storer is not None:
             storer['loss'].append(loss. item())
