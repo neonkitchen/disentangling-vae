@@ -32,7 +32,7 @@ pip install -r requirements.txt
 Use `python main.py <model-name> <param>` to train and/or evaluate a model. For example:
 
 ```
-python main.py btcvae_celeba_mini -d celeba -l btcvae --lr 0.001 -b 256 -e 5
+python main_WandB.py btcvae_celeba_mini -d celeba -l btcvae --lr 0.001 -b 256 -e 5
 ```
 
 You can run predefined experiments and hyper-parameters using `-x <experiment>`. Those hyperparameters are found in `hyperparam.ini`. Pretrained models for each experiment can be found in `results/<experiment>` (created using `./bin/train_all.sh`).
