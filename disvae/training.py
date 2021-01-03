@@ -173,6 +173,11 @@ class Trainer():
                 rec_loss, non_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                                 storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
+            elif self.loss_name == "btcvaeAnneal":
+
+                rec_loss, non_rec_loss, anneal_reg, alpha, mi_loss, beta, tc_loss, gamma , dw_kl_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
+                                storer, latent_sample=latent_sample)
+                loss = rec_loss + non_rec_loss
             else:
                 loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                                 storer, latent_sample=latent_sample)
