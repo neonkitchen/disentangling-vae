@@ -133,6 +133,10 @@ class Trainer():
                     rec_loss, non_rec_loss = self._train_iteration(data, storer)
                     iter_loss = rec_loss + non_rec_loss
                     wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
+                elif self.loss_name == "btcvaeAnneal":
+                    rec_loss, non_rec_loss, anneal_reg, alpha, mi_loss, beta, tc_loss, gamma , dw_kl_loss = self._train_iteration(data, storer)
+                    iter_loss = rec_loss + non_rec_loss
+                    wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss, "anneal_reg": anneal_reg, "alpha": alpha, "mi_loss": mi_loss,"beta": beta, "tc_loss": tc_loss, "gamma": gamma ,"dw_kl_loss": dw_kl_loss })
                 else:    
                     iter_loss = self._train_iteration(data, storer)
                     wandb.log({"epoch": epoch, "it:": it, "loss": iter_loss})
@@ -142,9 +146,9 @@ class Trainer():
 
                 t.set_postfix(loss=iter_loss)
                 t.update()
-        wandb.log({"epoch": epoch, "epoch_loss": epoch_loss })
+        wandb.log({"epoch_loss": epoch_loss })
         mean_epoch_loss = epoch_loss / len(data_loader)
-        wandb.log({"epoch": epoch, "mean_epoch_los": mean_epoch_loss })
+        wandb.log({"mean_epoch_los": mean_epoch_loss })
         return mean_epoch_loss
 
     def _train_iteration(self, data, storer):

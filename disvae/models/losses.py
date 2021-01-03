@@ -14,7 +14,7 @@ from disvae.utils.math import (log_density_gaussian, log_importance_weight_matri
                                matrix_log_density_gaussian)
 
 
-LOSSES = ["VAE", "betaH", "betaB", "factor", "btcvae"]
+LOSSES = ["VAE", "betaH", "betaB", "factor", "btcvae", "btcvaeAnneal"]
 RECON_DIST = ["bernoulli", "laplace", "gaussian"]
 
 # TO-DO: clean n_data and device
@@ -39,6 +39,12 @@ def get_loss_f(loss_name, **kwargs_parse):
                            **kwargs_all)
     elif loss_name == "btcvae":
         return BtcvaeLoss(kwargs_parse["n_data"],
+                          alpha=kwargs_parse["btcvae_A"],
+                          beta=kwargs_parse["btcvae_B"],
+                          gamma=kwargs_parse["btcvae_G"],
+                          **kwargs_all)
+    elif loss_name == "btcvaeAnneal":
+        return BtcvaeLossAnneal(kwargs_parse["n_data"],
                           alpha=kwargs_parse["btcvae_A"],
                           beta=kwargs_parse["btcvae_B"],
                           gamma=kwargs_parse["btcvae_G"],
@@ -388,7 +394,7 @@ class BtcvaeLoss(BaseLoss):
 
         return rec_loss, non_rec_loss
 
-class btcvaeAnnealLoss(BaseLoss):
+class btcvaeAnneal(BaseLoss):
     """
     Compute the decomposed KL loss with either minibatch weighted sampling or
     minibatch stratified sampling according to [1]
@@ -450,10 +456,12 @@ class btcvaeAnnealLoss(BaseLoss):
         anneal_reg = (linear_annealing(0, 1, self.n_train_steps, self.steps_anneal)
                       if is_train else 1)
 
-        # total loss 
-        loss = rec_loss + (anneal_reg *self.alpha * mi_loss +
+        non_rec_loss = (anneal_reg *self.alpha * mi_loss +
                            anneal_reg *self.beta * tc_loss +
                            anneal_reg * self.gamma * dw_kl_loss)
+        
+        # total loss 
+        loss = rec_loss + non_rec_loss
 
         if storer is not None:
             storer['loss'].append(loss.item())
@@ -463,7 +471,7 @@ class btcvaeAnnealLoss(BaseLoss):
             # computing this for storing and comparaison purposes
             _ = _kl_normal_loss(*latent_dist, storer)
 
-        return loss
+        return rec_loss, non_rec_loss, anneal_reg, self.alpha, mi_loss, self.beta, tc_loss, self.gamma , dw_kl_loss
 
 
 
