@@ -18,6 +18,8 @@ from utils.visualize import GifTraversalsTraining
 
 
 CONFIG_FILE = "hyperparam.ini"
+
+
 RES_DIR = "results"
 LOG_LEVELS = list(logging._levelToName.values())
 ADDITIONAL_EXP = ['custom', "debug", "best_celeba", "best_dsprites"]
@@ -210,14 +212,14 @@ def main(args):
     exp_dir = os.path.join(RES_DIR, args.name)
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
 
-
+    config = wandb.config
     with wandb.init(name="loss-split-test", 
                     project="disentangle-test",
                     notes='This is a test run', 
                     tags=['btcvae', 'dspites'],
                     entity='neonkitchen',
-            config = wandb.config):
-
+            config = config):
+        wandb.config.update(args)
         if not args.is_eval_only:
 
             create_safe_directory(exp_dir, logger=logger)
