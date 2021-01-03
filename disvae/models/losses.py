@@ -44,7 +44,7 @@ def get_loss_f(loss_name, **kwargs_parse):
                           gamma=kwargs_parse["btcvae_G"],
                           **kwargs_all)
     elif loss_name == "btcvaeAnneal":
-        return BtcvaeLossAnneal(kwargs_parse["n_data"],
+        return BtcvaeAnnealLoss(kwargs_parse["n_data"],
                           alpha=kwargs_parse["btcvae_A"],
                           beta=kwargs_parse["btcvae_B"],
                           gamma=kwargs_parse["btcvae_G"],
@@ -394,7 +394,7 @@ class BtcvaeLoss(BaseLoss):
 
         return rec_loss, non_rec_loss
 
-class btcvaeAnneal(BaseLoss):
+class BtcvaeAnnealLoss(BaseLoss):
     """
     Compute the decomposed KL loss with either minibatch weighted sampling or
     minibatch stratified sampling according to [1]
