@@ -149,6 +149,20 @@ def parse_arguments(args_to_parse):
     btcvae.add_argument('--btcvae-B', type=float,
                         default=default_config['btcvae_B'],
                         help="Weight of the TC term (beta in the paper).")
+    ### btcvae loss specific argument group 
+    btcvaeAnneal = parser.add_argument_group('beta-tcvae specific parameters')
+
+    btcvaeAnneal .add_argument('--btcvae-A', type=float,
+                        default=default_config['btcvae_A'],
+                        help="Weight of the MI term (alpha in the paper).")
+
+    btcvaeAnneal .add_argument('--btcvae-G', type=float,
+                        default=default_config['btcvae_G'],
+                        help="Weight of the dim-wise KL term (gamma in the paper).")
+
+    btcvaeAnneal .add_argument('--btcvae-B', type=float,
+                        default=default_config['btcvae_B'],
+                        help="Weight of the TC term (beta in the paper).")
 
     ### Evaluation specific options argument group
     evaluation = parser.add_argument_group('Evaluation specific options')
