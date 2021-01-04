@@ -104,7 +104,7 @@ class Trainer():
         delta_time = (default_timer() - start) / 60
         self.logger.info('Finished training after {:.1f} min.'.format(delta_time))
 
-    def _train_epoch(self, data_loader, storer, epoch, loss_name):
+    def _train_epoch(self, data_loader, storer, epoch):
         """
         Trains the model for one epoch.
 
@@ -127,31 +127,18 @@ class Trainer():
         kwargs = dict(desc="Epoch {}".format(epoch + 1), leave=False,
                       disable=not self.is_progress_bar)
         with trange(len(data_loader), **kwargs) as t:
-            it = 0
             for _, (data, _) in enumerate(data_loader):
-                if self.loss_name == "btcvae":
-                    rec_loss, non_rec_loss = self._train_iteration(data, storer)
-                    iter_loss = rec_loss + non_rec_loss
-                    wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
-                elif self.loss_name == "btcvaeAnneal":
-                    rec_loss, non_rec_loss, anneal_reg, alpha, mi_loss, beta, tc_loss, gamma , dw_kl_loss = self._train_iteration(data, storer)
-                    iter_loss = rec_loss + non_rec_loss
-                    wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss, "anneal_reg": anneal_reg, "alpha": alpha, "mi_loss": mi_loss,"beta": beta, "tc_loss": tc_loss, "gamma": gamma ,"dw_kl_loss": dw_kl_loss })
-                else:    
-                    iter_loss = self._train_iteration(data, storer)
-                    wandb.log({"epoch": epoch, "it:": it, "loss": iter_loss})
+                iter_loss = self._train_iteration(data, storer)
                 epoch_loss += iter_loss
-                
-                it=+1
 
                 t.set_postfix(loss=iter_loss)
-                t.update()
+                t.update()      
         wandb.log({"epoch_loss": epoch_loss })
         mean_epoch_loss = epoch_loss / len(data_loader)
         wandb.log({"mean_epoch_los": mean_epoch_loss })
         return mean_epoch_loss
 
-    def _train_iteration(self, data, storer):
+    def _train_iteration(self, data, storer, loss_name):
         """
         Trains the model for one iteration on a batch of data.
 
@@ -165,34 +152,33 @@ class Trainer():
         """
         batch_size, channel, height, width = data.size()
         data = data.to(self.device)
-        
+
         try:
             recon_batch, latent_dist, latent_sample = self.model(data)
-            if self.loss_name == "btcvae":
-
-                rec_loss, non_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
-                                storer, latent_sample=latent_sample)
+            if loss_name == "btcvae":
+                rec_loss, on_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
+                               storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
-            elif self.loss_name == "btcvaeAnneal":
-
+                wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
+            elif loss_name == "btcvaeAnneal":
                 rec_loss, non_rec_loss, anneal_reg, alpha, mi_loss, beta, tc_loss, gamma , dw_kl_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
-                                storer, latent_sample=latent_sample)
+                               storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
-            else:
+                wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss, "anneal_reg": anneal_reg, "alpha": alpha, "mi_loss": mi_loss,"beta": beta, "tc_loss": tc_loss, "gamma": gamma ,"dw_kl_loss": dw_kl_loss })
+            else: 
                 loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
-                                storer, latent_sample=latent_sample)
+                storer, latent_sample=latent_sample)
+            
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
 
         except ValueError:
             # for losses that use multiple optimizers (e.g. Factor)
-            loss = self.loss_f.call_optimize(data , self.model, self.optimizer, storer)
-        
-        if self.loss_name == "btcvae":
-            return rec_loss.item(), non_rec_loss.item()
-        else:
-            return loss.item()
+            loss = self.loss_f.call_optimize(data, self.model, self.optimizer, storer)
+
+        return loss.item()
+
 
 
 class LossesLogger(object):

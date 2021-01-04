@@ -392,7 +392,7 @@ class BtcvaeLoss(BaseLoss):
             # computing this for storing and comparaison purposes
             _ = _kl_normal_loss(*latent_dist, storer)
 
-        return rec_loss, non_rec_loss
+        return (rec_loss, non_rec_loss)
 
 class BtcvaeAnnealLoss(BaseLoss):
     """
@@ -471,7 +471,7 @@ class BtcvaeAnnealLoss(BaseLoss):
             # computing this for storing and comparaison purposes
             _ = _kl_normal_loss(*latent_dist, storer)
 
-        return rec_loss, non_rec_loss, anneal_reg, self.alpha, mi_loss, self.beta, tc_loss, self.gamma , dw_kl_loss
+        return (rec_loss, non_rec_loss, anneal_reg, self.alpha, mi_loss, self.beta, tc_loss, self.gamma , dw_kl_loss)
 
 
 
