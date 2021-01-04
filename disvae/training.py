@@ -159,12 +159,12 @@ class Trainer():
                 rec_loss, on_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                                storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
-                wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
+                wandb.log({"loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})
             elif loss_name == "btcvaeAnneal":
                 rec_loss, non_rec_loss, anneal_reg, alpha, mi_loss, beta, tc_loss, gamma , dw_kl_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                                storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
-                wandb.log({"it:": it, "loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss, "anneal_reg": anneal_reg, "alpha": alpha, "mi_loss": mi_loss,"beta": beta, "tc_loss": tc_loss, "gamma": gamma ,"dw_kl_loss": dw_kl_loss })
+                wandb.log({"loss": iter_loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss, "anneal_reg": anneal_reg, "alpha": alpha, "mi_loss": mi_loss,"beta": beta, "tc_loss": tc_loss, "gamma": gamma ,"dw_kl_loss": dw_kl_loss })
             else: 
                 loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                 storer, latent_sample=latent_sample)
