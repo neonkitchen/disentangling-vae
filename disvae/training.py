@@ -156,7 +156,7 @@ class Trainer():
         try:
             recon_batch, latent_dist, latent_sample = self.model(data)
             if loss_name == "btcvae":
-                rec_loss, on_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
+                rec_loss, non_rec_loss = self.loss_f(data, recon_batch, latent_dist, self.model.training,
                                storer, latent_sample=latent_sample)
                 loss = rec_loss + non_rec_loss
                 wandb.log({"loss": loss, "rec_loss": rec_loss, "non_rec_loss": non_rec_loss})

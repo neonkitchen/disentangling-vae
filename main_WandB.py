@@ -252,7 +252,7 @@ def main(args):
                                 n_data=len(train_loader.dataset),
                                 device=device,
                                 **vars(args))
-            wandb.watch(model, optimizer, log="all", log_freq=1)
+            wandb.watch(model, optimizer, log="parameters", log_freq=1000)
             trainer = Trainer(model, optimizer, loss_f=loss_f,
                             loss_name=args.loss,
                             device=device,
