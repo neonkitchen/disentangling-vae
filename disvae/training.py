@@ -83,7 +83,7 @@ class Trainer():
         self.model.train()
         for epoch in range(epochs):
             storer = defaultdict(list)
-            mean_epoch_loss = self._train_epoch(data_loader, storer, epoch, self.loss_name)
+            mean_epoch_loss = self._train_epoch(data_loader, storer, epoch)
             self.logger.info('Epoch: {} Average loss per image: {:.2f}'.format(epoch + 1,
                                                                                mean_epoch_loss))
             
@@ -128,7 +128,7 @@ class Trainer():
                       disable=not self.is_progress_bar)
         with trange(len(data_loader), **kwargs) as t:
             for _, (data, _) in enumerate(data_loader):
-                iter_loss = self._train_iteration(data, storer)
+                iter_loss = self._train_iteration(data, storer, self.loss_name)
                 epoch_loss += iter_loss
 
                 t.set_postfix(loss=iter_loss)
