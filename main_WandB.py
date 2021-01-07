@@ -214,7 +214,7 @@ def main(args):
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
 
     config = wandb.config
-    with wandb.init(name=args.general.name, 
+    with wandb.init(name=args.name, 
                     project="disentangle-anneal",
                     notes='This is a test run', 
                     tags=['btcvae', 'dspites'],
