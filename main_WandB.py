@@ -35,7 +35,7 @@ def parse_arguments(args_to_parse):
     args_to_parse: list of str
         Arguments to parse (splitted on whitespaces).
     """
-    default_config = get_config_section([CONFIG_FILE], "Custom")
+    default_config = get_config_section([CONFIG_FILE], "anneal10k")
 
     description = "PyTorch implementation and evaluation of disentangled Variational AutoEncoders and metrics."
     parser = argparse.ArgumentParser(description=description,
@@ -171,6 +171,7 @@ def parse_arguments(args_to_parse):
                             help='Batch size for evaluation.')
 
     args = parser.parse_args(args_to_parse)
+    '''
     if args.experiment != 'custom':
         if args.experiment not in ADDITIONAL_EXP:
             # update all common sections first
@@ -186,7 +187,7 @@ def parse_arguments(args_to_parse):
         except KeyError as e:
             if args.experiment in ADDITIONAL_EXP:
                 raise e  # only reraise if didn't use common section
-
+    '''
     return args
 
 
