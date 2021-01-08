@@ -17,7 +17,7 @@ from utils.helpers import (create_safe_directory, get_device, set_seed, get_n_pa
 from utils.visualize import GifTraversalsTraining
 
 
-CONFIG_FILE = "hyperparam.ini"
+CONFIG_FILE = "hyperparam2.ini"
 
 
 RES_DIR = "results"
