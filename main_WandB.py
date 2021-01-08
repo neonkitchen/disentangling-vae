@@ -35,7 +35,7 @@ def parse_arguments(args_to_parse):
     args_to_parse: list of str
         Arguments to parse (splitted on whitespaces).
     """
-    default_config = get_config_section([CONFIG_FILE], "anneal25k")
+    default_config = get_config_section([CONFIG_FILE], "banneal25k")
 
     description = "PyTorch implementation and evaluation of disentangled Variational AutoEncoders and metrics."
     parser = argparse.ArgumentParser(description=description,
