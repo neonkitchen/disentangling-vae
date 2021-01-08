@@ -9,6 +9,7 @@ from timeit import default_timer
 from tqdm import trange, tqdm
 import numpy as np
 import torch
+import wandb
 
 from disvae.models.losses import get_loss_f
 from disvae.utils.math import log_density_gaussian
