@@ -14,7 +14,8 @@ archive*
 log*
 pretrained_models
 test/
-wandb/
+wandb/*
+runs/*
 
 #Byte-compiled / optimized / DLL files
 *.egg-info
