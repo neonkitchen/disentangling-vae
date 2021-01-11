@@ -28,41 +28,18 @@ EXPERIMENTS = ADDITIONAL_EXP + ["{}_{}".format(loss, data)
                                 for data in DATASETS]
 
 sweep_config = {
-    'method': 'random', #grid, random
+    'method': 'grid', #grid, random
     'metric': {
       'name': 'loss',
       'goal': 'minimise'   
     },
     'parameters': {
-        'epochs': {
-            'values': [10, 20, 50]
+        'seed': {
+            'values': [1234, 9876, 5678]
         },
-        'dropout': {
-            'values': [0.3, 0.4, 0.5]
-        },
-        'conv_layer_size': {
-            'values': [16, 32, 64]
-        },
-        'encoder_size': {
-            'values': [128, 256, 512]
-        },
-        'decoder_size': {
-            'values': [256, 512, 1024]
-        },
-        'weight_decay': {
-            'values': [0.0005, 0.005, 0.05]
-        },
-        'learning_rate': {
-            'values': [1e-2, 1e-3, 1e-4, 3e-4, 3e-5, 1e-5]
-        },
-        'optimizer': {
-            'values': ['adam', 'nadam', 'sgd', 'rmsprop']
-        },
-        'activation': {
-            'values': ['relu', 'elu', 'selu', 'softmax']
-        },
-        'layer': {
-            'values': ['LSTM', 'GRU']
+        'reg_anneal': {
+            'values': [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 100000]
+        }
         }
     }
 }
@@ -253,7 +230,7 @@ def main(args):
     exp_dir = os.path.join(RES_DIR, args.name)
     logger.info("Root directory for saving and loading experiments: {}".format(exp_dir))
 
-
+ 
     # Initialize a new sweep
     # Arguments:
     #     – sweep_config: the sweep config dictionary defined above
