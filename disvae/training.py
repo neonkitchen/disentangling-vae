@@ -133,7 +133,7 @@ class Trainer():
 
                 t.set_postfix(loss=iter_loss)
                 t.update()      
-        wandb.log({"epoch_loss": epoch_loss })
+        wandb.log({"ecd poch_loss": epoch_loss })
         mean_epoch_loss = epoch_loss / len(data_loader)
         wandb.log({"mean_epoch_los": mean_epoch_loss })
         return mean_epoch_loss
