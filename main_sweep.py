@@ -174,21 +174,21 @@ def parse_arguments(args_to_parse):
                             help='Batch size for evaluation.')
 
     args = parser.parse_args(args_to_parse)
-    if args.experiment != 'sweep':
-        if args.experiment not in ADDITIONAL_EXP:
+    #if args.experiment != 'sweep':
+        #if args.experiment not in ADDITIONAL_EXP:
             # update all common sections first
-            model, dataset = args.experiment.split("_")
-            common_data = get_config_section([CONFIG_FILE], "Common_{}".format(dataset))
-            update_namespace_(args, common_data)
-            common_model = get_config_section([CONFIG_FILE], "Common_{}".format(model))
-            update_namespace_(args, common_model)
+            #model, dataset = args.experiment.split("_")
+            #common_data = get_config_section([CONFIG_FILE], "Common_{}".format(dataset))
+            #update_namespace_(args, common_data)
+            #common_model = get_config_section([CONFIG_FILE], "Common_{}".format(model))
+            #update_namespace_(args, common_model)
 
-        try:
-            experiments_config = get_config_section([CONFIG_FILE], args.experiment)
-            update_namespace_(args, experiments_config)
-        except KeyError as e:
-            if args.experiment in ADDITIONAL_EXP:
-                raise e  # only reraise if didn't use common section
+        #try:
+            #experiments_config = get_config_section([CONFIG_FILE], args.experiment)
+            #update_namespace_(args, experiments_config)
+        #except KeyError as e:
+            #if args.experiment in ADDITIONAL_EXP:
+                #raise e  # only reraise if didn't use common section
 
     return args
 
