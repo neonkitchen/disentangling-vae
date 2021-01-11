@@ -236,7 +236,7 @@ def main(args):
     #     – sweep_config: the sweep config dictionary defined above
     #     – entity: Set the username for the sweep
     #     – project: Set the project name for the sweep
-    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="disentangle-sweep")
+    
 
     config = wandb.config
     with wandb.init(name="loss-split-test", 
@@ -245,6 +245,7 @@ def main(args):
                     tags=['btcvae', 'dspites'],
                     entity='neonkitchen',
             config = config):
+        sweep_id = wandb.sweep(sweep_config, entity="sweep", project="disentangle-sweep")
         wandb.config.update(args)
         if not args.is_eval_only:
 
