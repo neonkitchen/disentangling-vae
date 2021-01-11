@@ -191,7 +191,9 @@ def parse_arguments(args_to_parse):
     if args.experiment != 'custom':
         if args.experiment not in ADDITIONAL_EXP:
             # update all common sections first
-            model, dataset = args.experiment.split("_")
+            #model, dataset = args.experiment.split("_")
+            model = args.experiment
+            dataset = 'dspites'
             common_data = get_config_section([CONFIG_FILE], "Common_{}".format(dataset))
             update_namespace_(args, common_data)
             common_model = get_config_section([CONFIG_FILE], "Common_{}".format(model))
