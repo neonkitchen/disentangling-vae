@@ -222,21 +222,7 @@ def main(args):
     #     – sweep_config: the sweep config dictionary defined above
     #     – entity: Set the username for the sweep
     #     – project: Set the project name for the sweep
-    sweep_config = {
-    'method': 'grid', #grid, random
-    #'metric': {
-     # 'name': 'loss',
-    #'goal': 'minimise'   
-    #},
-    'parameters': {
-        'seed': {
-            'values': [1234, 9876, 5678]
-        },
-        'reg_anneal': {
-            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
-        }
-        }
-    }
+
     
     
 
@@ -316,7 +302,21 @@ def main(args):
 
 
 
-
+sweep_config = {
+    'method': 'grid', #grid, random
+    #'metric': {
+     # 'name': 'loss',
+    #'goal': 'minimise'   
+    #},
+    'parameters': {
+        'seed': {
+            'values': [1234, 9876, 5678]
+        },
+        'reg_anneal': {
+            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
+        }
+        }
+    }
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
