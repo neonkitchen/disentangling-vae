@@ -27,21 +27,7 @@ EXPERIMENTS = ADDITIONAL_EXP + ["{}_{}".format(loss, data)
                                 for loss in LOSSES
                                 for data in DATASETS]
 
-sweep_config = {
-    'method': 'grid', #grid, random
-    'metric': {
-      'name': 'loss',
-      'goal': 'minimise'   
-    },
-    'parameters': {
-        'seed': {
-            'values': [1234, 9876, 5678]
-        },
-        'reg_anneal': {
-            'values': [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
-        }
-        }
-    }
+
 
 
 def parse_arguments(args_to_parse):
@@ -236,16 +222,32 @@ def main(args):
     #     – sweep_config: the sweep config dictionary defined above
     #     – entity: Set the username for the sweep
     #     – project: Set the project name for the sweep
+    sweep_config = {
+    'method': 'grid', #grid, random
+    'metric': {
+      'name': 'loss',
+      'goal': 'minimise'   
+    },
+    'parameters': {
+        'seed': {
+            'values': [1234, 9876, 5678]
+        },
+        'reg_anneal': {
+            'values': [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
+        }
+        }
+    }
     
+    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="--sweeps--")
 
     config = wandb.config
-    with wandb.init(name="loss-split-test", 
-                    project="disentangle-test",
+    with wandb.init(name="sweep-reg_anneal-seed", 
+                    project="--sweeps--",
                     notes='This is a test run', 
                     tags=['btcvae', 'dspites'],
                     entity='neonkitchen',
             config = config):
-        sweep_id = wandb.sweep(sweep_config, entity="sweep", project="disentangle-sweep")
+        
         wandb.config.update(args)
         if not args.is_eval_only:
 
