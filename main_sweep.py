@@ -174,21 +174,21 @@ def parse_arguments(args_to_parse):
                             help='Batch size for evaluation.')
 
     args = parser.parse_args(args_to_parse)
-    #if args.experiment != 'sweep':
-        #if args.experiment not in ADDITIONAL_EXP:
+    if args.experiment != 'sweep':
+        if args.experiment not in ADDITIONAL_EXP:
             # update all common sections first
-            #model, dataset = args.experiment.split("_")
-            #common_data = get_config_section([CONFIG_FILE], "Common_{}".format(dataset))
-            #update_namespace_(args, common_data)
-            #common_model = get_config_section([CONFIG_FILE], "Common_{}".format(model))
-            #update_namespace_(args, common_model)
+            model, dataset = args.experiment.split("_")
+            common_data = get_config_section([CONFIG_FILE], "Common_{}".format(dataset))
+            update_namespace_(args, common_data)
+            common_model = get_config_section([CONFIG_FILE], "Common_{}".format(model))
+            update_namespace_(args, common_model)
 
-        #try:
-            #experiments_config = get_config_section([CONFIG_FILE], args.experiment)
-            #update_namespace_(args, experiments_config)
-        #except KeyError as e:
-            #if args.experiment in ADDITIONAL_EXP:
-                #raise e  # only reraise if didn't use common section
+        try:
+            experiments_config = get_config_section([CONFIG_FILE], args.experiment)
+            update_namespace_(args, experiments_config)
+        except KeyError as e:
+            if args.experiment in ADDITIONAL_EXP:
+                raise e  # only reraise if didn't use common section
 
     return args
 
@@ -222,7 +222,23 @@ def main(args):
     #     – sweep_config: the sweep config dictionary defined above
     #     – entity: Set the username for the sweep
     #     – project: Set the project name for the sweep
-
+    sweep_config = {
+    'method': 'grid', #grid, random
+    #'metric': {
+     # 'name': 'loss',
+    #'goal': 'minimise'   
+    #},
+    'parameters': {
+        'seed': {
+            'values': [1234, 9876, 5678]
+        },
+        'reg_anneal': {
+            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
+        }
+        }
+    }
+    
+    
 
     config = wandb.config
     with wandb.init(name="sweep-reg_anneal-seed", 
@@ -303,23 +319,6 @@ def main(args):
 
 
 if __name__ == '__main__':
-    
-    sweep_config = {
-    'method': 'grid', #grid, random
-    #'metric': {
-     # 'name': 'loss',
-    #'goal': 'minimise'   
-    #},
-    'parameters': {
-        'seed': {
-            'values': [1234, 9876, 5678]
-        },
-        'reg_anneal': {
-            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
-        }
-        }
-    }
-    
-    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="sweep-reg_annealseed")
     args = parse_arguments(sys.argv[1:])
+    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="sweep")
     wandb.agent(sweep_id, main(args))
