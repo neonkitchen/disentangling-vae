@@ -224,25 +224,25 @@ def main(args):
     #     – project: Set the project name for the sweep
     sweep_config = {
     'method': 'grid', #grid, random
-    'metric': {
-      'name': 'loss',
-      'goal': 'minimise'   
-    },
+    #'metric': {
+     # 'name': 'loss',
+    #'goal': 'minimise'   
+    #},
     'parameters': {
         'seed': {
-            'values': [1234]#, 9876, 5678]
+            'values': [1234, 9876, 5678]
         },
         'reg_anneal': {
-            'values': [100000, 200000]#, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
+            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
         }
         }
     }
     
-    sweep_id = wandb.sweep(sweep_config)
+    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="sweep-reg_anneal*seed")
 
     config = wandb.config
     with wandb.init(name="sweep-reg_anneal-seed", 
-                    project="--sweeps--",
+                    ,
                     notes='This is a test run', 
                     tags=['btcvae', 'dsprites'],
                     entity='neonkitchen',
