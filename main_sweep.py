@@ -17,7 +17,7 @@ from utils.helpers import (create_safe_directory, get_device, set_seed, get_n_pa
 from utils.visualize import GifTraversalsTraining
 
 
-CONFIG_FILE = "hyperparam.ini"
+CONFIG_FILE = "hyperparam2.ini"
 
 
 RES_DIR = "results"
@@ -38,7 +38,7 @@ sweep_config = {
             'values': [1234, 9876, 5678]
         },
         'reg_anneal': {
-            'values': [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 100000]
+            'values': [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
         }
         }
     }
