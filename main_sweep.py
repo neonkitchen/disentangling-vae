@@ -222,27 +222,10 @@ def main(args):
     #     – sweep_config: the sweep config dictionary defined above
     #     – entity: Set the username for the sweep
     #     – project: Set the project name for the sweep
-    sweep_config = {
-    'method': 'grid', #grid, random
-    #'metric': {
-     # 'name': 'loss',
-    #'goal': 'minimise'   
-    #},
-    'parameters': {
-        'seed': {
-            'values': [1234, 9876, 5678]
-        },
-        'reg_anneal': {
-            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
-        }
-        }
-    }
-    
-    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="sweep-reg_anneal*seed")
+
 
     config = wandb.config
     with wandb.init(name="sweep-reg_anneal-seed", 
-                    ,
                     notes='This is a test run', 
                     tags=['btcvae', 'dsprites'],
                     entity='neonkitchen',
@@ -320,5 +303,23 @@ def main(args):
 
 
 if __name__ == '__main__':
+    
+    sweep_config = {
+    'method': 'grid', #grid, random
+    #'metric': {
+     # 'name': 'loss',
+    #'goal': 'minimise'   
+    #},
+    'parameters': {
+        'seed': {
+            'values': [1234, 9876, 5678]
+        },
+        'reg_anneal': {
+            'values': [100000, 200000, 300000]#, 400000, 500000, 600000, 700000, 800000, 900000 , 1000000]
+        }
+        }
+    }
+    
+    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="sweep-reg_annealseed")
     args = parse_arguments(sys.argv[1:])
-    main(args)
+    wandb.agent(sweep_id, main(args))
