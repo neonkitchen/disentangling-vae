@@ -42,7 +42,7 @@ sweep_config = {
         }
         }
     }
-}
+
 
 def parse_arguments(args_to_parse):
     """Parse the command line arguments.
