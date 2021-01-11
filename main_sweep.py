@@ -231,6 +231,7 @@ def main(args):
                     notes='This is a test run', 
                     tags=['btcvae', 'dsprites'],
                     entity='neonkitchen',
+                    project]'sweep'
             config = config):
         
         wandb.config.update(args)
