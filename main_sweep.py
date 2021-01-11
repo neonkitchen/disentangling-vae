@@ -238,7 +238,7 @@ def main(args):
         }
     }
     
-    sweep_id = wandb.sweep(sweep_config, entity="sweep", project="--sweeps--")
+    sweep_id = wandb.sweep(sweep_config)
 
     config = wandb.config
     with wandb.init(name="sweep-reg_anneal-seed", 
