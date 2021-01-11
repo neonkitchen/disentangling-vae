@@ -17,7 +17,7 @@ from utils.helpers import (create_safe_directory, get_device, set_seed, get_n_pa
 from utils.visualize import GifTraversalsTraining
 
 
-CONFIG_FILE = "hyperparam2.ini"
+CONFIG_FILE = "hyperparam_sweep.ini"
 
 
 RES_DIR = "results"
@@ -244,7 +244,7 @@ def main(args):
     with wandb.init(name="sweep-reg_anneal-seed", 
                     project="--sweeps--",
                     notes='This is a test run', 
-                    tags=['btcvae', 'dspites'],
+                    tags=['btcvae', 'dsprites'],
                     entity='neonkitchen',
             config = config):
         
